@@ -13,7 +13,6 @@ There are two ways to use the script.
 
 
 ### Commands
-You can type them in every text boxes, wherever you want.
 |Command|Description|
 |-------|-----------|
 |#today[modifier]|Date of current day|
@@ -27,6 +26,7 @@ You can type them in every text boxes, wherever you want.
 |#sa(turday)[modifier]|Date of saturday this week|
 |#su(nday)[modifier]|Date of sunday this week|
 
+You can type them in every text boxes, wherever you want.
 
 ### Modifier
 With the modifier, you can modifie the resulting date. That means, you can get instead friday this week, the friday in two weeks.
