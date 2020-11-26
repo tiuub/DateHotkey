@@ -1,4 +1,4 @@
-#Include Hotstring.ahk
+﻿#Include Hotstring.ahk
 
 Hotstring("#heute(([\+\-0-9]+(t(age?)?|w(ochen?)?|m(onate?)?|j(ahre?)?)?)+)?`n", "today", 3)
 Hotstring("#gestern(([\+\-0-9]+(t(age?)?|w(ochen?)?|m(onate?)?|j(ahre?)?)?)+)?`n", "yesterday", 3)
@@ -10,6 +10,7 @@ Hotstring("#do(?:nnerstag)?(([\+\-0-9]+(t(age?)?|(w(ochen?)?)|m(onate?)?|j(ahre?
 Hotstring("#fr(?:eitag)?(([\+\-0-9]+(t(age?)?|(w(ochen?)?)|m(onate?)?|j(ahre?)?)?)+)?`n", "friday", 3)
 Hotstring("#sa(?:mstag)?(([\+\-0-9]+(t(age?)?|(w(ochen?)?)|m(onate?)?|j(ahre?)?)?)+)?`n", "saturday", 3)
 Hotstring("#so(?:nntag)?(([\+\-0-9]+(t(age?)?|(w(ochen?)?)|m(onate?)?|j(ahre?)?)?)+)?`n", "sunday", 3)
+Hotstring("#k(?:alender)?w(?:oche)?(([\+\-0-9]+(t(age?)?|(w(ochen?)?)|m(onate?)?|j(ahre?)?)?)+)?`n", "calendarweek", 3)
 
 return
 
@@ -45,6 +46,10 @@ sunday($) {
     SendInput % fWeekday($, 1) ; 1 stands for sunday
 }
 
+calendarweek($) {
+	SendInput % SubStr(fMiddleware($, 0, 0, 0, 0, "YWeek"), -1)
+}
+
 fDate(pDays:=0, pWeeks:=0, pMonths:=0, pYears:=0, form:="dd.MM.yyyy") {  ; Date Function (Sven Seebeck)
     pWeeks *= 7
 	datumWert :=  A_Now
@@ -72,7 +77,7 @@ fDate(pDays:=0, pWeeks:=0, pMonths:=0, pYears:=0, form:="dd.MM.yyyy") {  ; Date 
 }
 
 fMiddleware($, pDays:=0, pWeeks:=0, pMonths:=0, pYears:=0, form:="dd.MM.yyyy"){
-	While (Pos := Ma.Pos() = "" ? 1 : Ma.Pos()) := RegExMatch($.Value(1), "O)(([\+\-0-9]+)((t(age?)?|(w(ochen?))?|m(onate?)?|j(ahre?)?|$)))", Ma, Pos + StrLen(Ma.Value(1))) {
+	While (Pos := Ma.Pos() = "" ? 1 : Ma.Pos()) := RegExMatch($.Value(1), "O)(([\+\-0-9]+)((t(age?)?|w(ochen?)?|m(onate?)?|j(ahre?)?|$)))", Ma, Pos + StrLen(Ma.Value(1))) {
 		If InStr(Ma.Value(3), "t")
 			pDays += Ma.Value(2)
 		If InStr(Ma.Value(3), "w") || Ma.Value(3) = ""
