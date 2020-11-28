@@ -1,5 +1,38 @@
-﻿#Include Hotstring.ahk
+﻿; VERSION 1.2 DE (2020-11-28)
+; Created by tiuub
+;
+; GitHub: https://github.com/tiuub/DateHotkey
+; License: MIT (https://github.com/tiuub/DateHotkey)
 
+
+; Prevent running script multiple times
+#SingleInstance Prompt
+SetTitleMatchMode, RegEx
+DetectHiddenWindows, On
+while (processId:=WinExist(".*((EN|DE)_DateHotkey.(exe|ahk)).* ahk_class AutoHotkey", "", A_Scriptname))
+{
+    MsgBox, 52, Achtung, Ein anderer Prozess von DateHotkey läuft bereits. Dies kann mehrere Probleme verursachen.`n`nMöchten Sie den laufenden Prozess durch den aktuellen Prozess ersetzen?`n("Nein" beendet den aktuellen Prozess!)
+    IfMsgBox Yes
+        WinClose, ahk_id %processId%
+    else
+        Exit
+}
+
+
+; Check if include files are available
+if (InStr(A_Scriptname, ".ahk") and !FileExist("Hotstring.ahk"))
+{
+    MsgBox, 48, Achtung, Die Datei "Hotstring.ahk" fehlt! Bitte laden Sie sich diese Datei herunter, bevor Sie das Skript ausführen!
+    Run, https://github.com/tiuub/DateHotkey
+    Exit
+}
+else
+{
+    #Include *i Hotstring.ahk
+}
+
+
+; Start of script
 Hotstring("#heute(([\+\-0-9]+(t(age?)?|w(ochen?)?|m(onate?)?|j(ahre?)?)?)+)?`n", "today", 3)
 Hotstring("#gestern(([\+\-0-9]+(t(age?)?|w(ochen?)?|m(onate?)?|j(ahre?)?)?)+)?`n", "yesterday", 3)
 Hotstring("#morgen(([\+\-0-9]+(t(age?)?|w(ochen?)?|m(onate?)?|j(ahre?)?)?)+)?`n", "tomorrow", 3)

@@ -1,5 +1,38 @@
-﻿#Include Hotstring.ahk
+﻿; VERSION 1.2 EN (2020-11-28)
+; Created by tiuub
+;
+; GitHub: https://github.com/tiuub/DateHotkey
+; License: MIT (https://github.com/tiuub/DateHotkey)
 
+
+; Prevent running script multiple times
+#SingleInstance Prompt
+SetTitleMatchMode, RegEx
+DetectHiddenWindows, On
+while (processId:=WinExist(".*((EN|DE)_DateHotkey.(exe|ahk)).* ahk_class AutoHotkey", "", A_Scriptname))
+{
+    MsgBox, 52, Attention, Another Process of DateHotkey is already running. This can lead to serious bugs.`n`nWould you like to replace it with the current?`n(No will cancel the current process!)
+    IfMsgBox Yes
+        WinClose, ahk_id %processId%
+    else
+        Exit
+}
+
+
+; Check if include files are available
+if (InStr(A_Scriptname, ".ahk") and !FileExist("Hotstring.ahk"))
+{
+    MsgBox, 48, Attention, The Hotstring.ahk file is missing! Please download it first, before running the script!
+    Run, https://github.com/tiuub/DateHotkey
+    Exit
+}
+else
+{
+    #Include *i Hotstring.ahk
+}
+
+
+; Start of script
 Hotstring("#today(([\+\-0-9]+(d(ays?)?|w(eeks?)?|m(onths?)?|y(ears?)?)?)+)?`n", "today", 3)
 Hotstring("#yesterday(([\+\-0-9]+(d(ays?)?|w(eeks?)?|m(onths?)?|y(ears?)?)?)+)?`n", "yesterday", 3)
 Hotstring("#tomorrow(([\+\-0-9]+(d(ays?)?|w(eeks?)?|m(onths?)?|y(ears?)?)?)+)?`n", "tomorrow", 3)
