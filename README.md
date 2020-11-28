@@ -57,12 +57,15 @@ If you want to use the Modifier, you have to follow these rules
 ## Examples
 |Example|Description|
 |-------|-----------|
+|#yesterday|Date of yesterday|
+|#saturday|Date of saturday this week|
+|#we|Date of wednesday this week|
 |#today+4days-6weeks|Todays Date, plus 4 days and minus 6 weeks|
-|#monday+4days-2days|Monday of the week, commin in 2 days|
-|#tu4days+6w|Tuesday of the week, commin in 4 days and 6 weeks|
+|#monday+4days-2days|Date of monday in the week, comming in 2 days|
+|#tu4days+6w|Date of tuesday in the week, comming in 4 days and 6 weeks|
 |#yesterday4d6w3months|Yesterdays Date, plus 4 days, 6 weeks and 3 months|
 |#tomorrow2y4d6w|Tomorrows Date, plus 2 years, 4 days and 6 weeks|
-|#su500d40y2m|Sunday of the week, commin in 500 days, 40 years and 2 months|
+|#su500d40y2m|Date of sunday in the week, comming in 500 days, 40 years and 2 months|
 |#calendarweek4w|Calendar week in 4 weeks|
 |#cw3d2w4m|Calendar week in 3 days, 2 weeks and 4 months|
 
