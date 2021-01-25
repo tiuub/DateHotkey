@@ -1,4 +1,4 @@
-﻿; VERSION 1.2 EN (2020-11-28)
+﻿; VERSION 1.2.1 EN (2021-01-25)
 ; Created by tiuub
 ;
 ; GitHub: https://github.com/tiuub/DateHotkey
@@ -110,7 +110,7 @@ fDate(pDays:=0, pWeeks:=0, pMonths:=0, pYears:=0, form:="dd.MM.yyyy") {
 }
 
 fMiddleware($, pDays:=0, pWeeks:=0, pMonths:=0, pYears:=0, form:="dd.MM.yyyy"){
-	While (Pos := Ma.Pos() = "" ? 1 : Ma.Pos()) := RegExMatch($.Value(1), "O)(([\+\-0-9]+)((d(ays?)?|w(eeks?)|m(onths?)?|y(ears?)?|$)))", Ma, Pos + StrLen(Ma.Value(1))) {
+	While (Pos := Ma.Pos() = "" ? 1 : Ma.Pos()) := RegExMatch($.Value(1), "O)(([\+\-0-9]+)((d(ays?)?|w(eeks?)?|m(onths?)?|y(ears?)?|$)))", Ma, Pos + StrLen(Ma.Value(1))) {
 		If InStr(Ma.Value(3), "d")
 			pDays += Ma.Value(2)
 		If InStr(Ma.Value(3), "w") || Ma.Value(3) = ""

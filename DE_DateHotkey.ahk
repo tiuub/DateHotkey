@@ -1,4 +1,4 @@
-﻿; VERSION 1.2 DE (2020-11-28)
+﻿; VERSION 1.2.1 DE (2021-01-25)
 ; Created by tiuub
 ;
 ; GitHub: https://github.com/tiuub/DateHotkey
