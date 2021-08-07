@@ -1,7 +1,10 @@
 # DateHotkey
 
-[![GitHub all releases](https://img.shields.io/github/downloads/tiuub/DateHotkey/total)](https://github.com/tiuub/DateHotkey/releases/latest)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/tiuub/DateHotkey)](https://github.com/tiuub/DateHotkey/releases/latest)
+[![GitHub all releases](https://img.shields.io/github/downloads/tiuub/DateHotkey/total)](https://github.com/tiuub/DateHotkey/releases/latest)
+[![GitHub](https://img.shields.io/github/license/tiuub/DateHotkey)](https://github.com/tiuub/KeeOtp2/blob/master/DateHotkey)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5F5QB7744AD5G&source=url)
+[![Donate](https://img.shields.io/github/sponsors/tiuub)](https://github.com/sponsors/tiuub)
 
 Dieses Skript soll Sie bei täglichen bürokratischen Problemen helfen. Mit diesem Skript können leicht Daten von zukünftigen, vergangen oder aktuellen Tagen oder Kalenderwochen erlangt werden.
 
@@ -10,8 +13,8 @@ Dieses Skript soll Sie bei täglichen bürokratischen Problemen helfen. Mit dies
 ## Installation
 
 Es gibt zwei Möglichkeiten das Skript zu nutzen:
-1. Laden Sie die DE_DateHotkey.exe-Datei aus den [Veröffentlichungen](https://github.com/tiuub/DateHotkey/releases/latest) herunter und führen Sie diese aus
-2. Laden Sie sich die Dateien DE_DateHotkey.ahk und Hotstring.ahk herunter und führen diese mit einer installierten Version von [AutoHotkey](https://www.autohotkey.com) aus
+1. Laden Sie die DateHotkey.exe-Datei aus den [Veröffentlichungen](https://github.com/tiuub/DateHotkey/releases/latest) herunter und führen Sie diese aus
+2. Laden Sie sich die Dateie DateHotkey.ahk herunter und führen Sie diese mit einer installierten Version von [AutoHotkey](https://www.autohotkey.com) aus
 
 
 ## Befehle
@@ -69,6 +72,28 @@ Wenn Sie den Modifier verwenden möchten, müssen Sie folgende Regeln beachten:
 |#kalenderwoche4w|Kalenderwoche in 4 Wochen|
 |#kw3t2w4m|Kalenderwoche in 3 Tage, 2 Wochen und 4 Monate|
 
+## Customization
+Sie können folgende Optionen konfigurieren:
+**Recognition Key**: Diese Taste bestätigt Ihre Eingabe und beendet die Sequenz. (Z.b. *#heute\\ENTER\\ or #tomorrow\\TABULATOR\\)
+**Ending Key**: Diese Taste wird nach erfolgreichem Ersetzen der Sequenz gedrückt.
+**Date Format**: Hier können Sie Ihr gewünschtes Format für das Datum auswählen.
+**Language**: Hier können Sie Ihre bevorzugte Sprache einstellen.
+
+Um diese Optionen einzusehen, klicken Sie im unteren Bereich Ihres Bildschirms auf das TrayIcon des Skriptes.
+
+## Contributing
+Wenn Sie dieses Projekt unterstützen möchten, haben Sie folgende Optionen:
+
+**GitHub Sponsor**: [hier](https://github.com/sponsors/tiuub)
+**PayPal Donation**: [hier](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5F5QB7744AD5G&source=url)
+
+Vielen Dank für Ihre Unterstützung!
 
 ## Lizenz
-[![GitHub](https://img.shields.io/github/license/tiuub/DateHotkey)]()
+[![GitHub](https://img.shields.io/github/license/tiuub/DateHotkey)](https://github.com/tiuub/DateHotkey/blob/master/LICENSE)
+
+## Dependencies
+Dependencie | Quelle | Author | Lizenz
+--- | --- | --- | ---
+**Hotstring** | [source](https://github.com/menixator/hotstring) | [menixator](https://github.com/menixator) | [Apache 2.0](https://github.com/menixator/hotstring/blob/master/LICENSE)
+**GetDateFormatEx** | [source](https://www.autohotkey.com/boards/viewtopic.php?p=56009#p56009) | [jNizM](https://www.autohotkey.com/boards/memberlist.php?mode=viewprofile&u=75&sid=0755f371a2dc1a946c44358fab072567)
