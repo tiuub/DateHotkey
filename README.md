@@ -85,6 +85,7 @@ To access this options, right-click on the TrayIcon in the lower right corner of
 If you want to support this project, you have two options:
 
 **GitHub Sponsor**: [here](https://github.com/sponsors/tiuub)
+
 **PayPal Donation**: [here](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5F5QB7744AD5G&source=url)
 
 Thank you, for your contribution!
@@ -96,4 +97,4 @@ Thank you, for your contribution!
 Dependencie | Source | Author | License
 --- | --- | --- | ---
 **Hotstring** | [source](https://github.com/menixator/hotstring) | [menixator](https://github.com/menixator) | [Apache 2.0](https://github.com/menixator/hotstring/blob/master/LICENSE)
-**GetDateFormatEx** | [source](https://www.autohotkey.com/boards/viewtopic.php?p=56009#p56009) | [jNizM](https://www.autohotkey.com/boards/memberlist.php?mode=viewprofile&u=75&sid=0755f371a2dc1a946c44358fab072567)
+**GetDateFormatEx** | [source](https://www.autohotkey.com/boards/viewtopic.php?p=56009#p56009) | [jNizM](https://www.autohotkey.com/boards/memberlist.php?mode=viewprofile&u=75&sid=0755f371a2dc1a946c44358fab072567) | Not given
