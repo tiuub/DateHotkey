@@ -160,6 +160,8 @@ createTrayMenu() {
     Menu, %recognitionKeyDefaultMenuName%, Add, Whitespace, % BoundRecognitionKeyWhitespace, +Radio
     Menu, %recognitionKeyDefaultMenuName%, Add, Tabulator, % BoundRecognitionKeyTabulator, +Radio
     Menu, %recognitionKeyDefaultMenuName%, Add, Dot, % BoundRecognitionKeyDot, +Radio
+    Menu, %recognitionKeyDefaultMenuName%, Add
+    Menu, %recognitionKeyDefaultMenuName%, Add, Help, HelpRecognitionKey
     Menu, Tray, Add, Recognition Key, :%recognitionKeyDefaultMenuName%
     
     BoundEndingKeyNone := Func("EndingKey").Bind("")
@@ -168,6 +170,8 @@ createTrayMenu() {
     Menu, %endingKeyDefaultMenuName%, Add, %endingKeyDefaultItemName%, % BoundEndingKeyNone, +Radio
     Menu, %endingKeyDefaultMenuName%, Add, Return, % BoundEndingKeyReturn, +Radio
     Menu, %endingKeyDefaultMenuName%, Add, Tabulator, % BoundEndingKeyTabulator, +Radio
+    Menu, %endingKeyDefaultMenuName%, Add
+    Menu, %endingKeyDefaultMenuName%, Add, Help, HelpEndingKey
     Menu, Tray, Add, Ending Character, :%endingKeyDefaultMenuName%
     
     
@@ -226,6 +230,18 @@ createTrayMenu() {
     Menu, UnitedStates, Add, % Format("d MMMM, yyyy ({1})", GetDateFormatEx(startingTimeDate, "d MMMM, yyyy")), % BoundDateFormatUnitedStatesD_MMMM__YYYY, +Radio
     Menu, %dateFormatDefaultMenuName%, Add, United States, :UnitedStates
     
+    
+    ; Other formats: d/M/yyyy;dd/MM/yyyy;d/M/yy;dd/MM/yy
+    BoundDateFormatOthersD_M_YYYY := Func("DateFormat").Bind("d/M/yyyy")
+    BoundDateFormatOthersDD_MM_YYYY := Func("DateFormat").Bind("dd/MM/yyyy")
+    BoundDateFormatOthersD_M_YY := Func("DateFormat").Bind("d/M/yy")
+    BoundDateFormatOthersDD_MM_YY := Func("DateFormat").Bind("dd/MM/yy")
+    Menu, Others, Add, % Format("d/M/yyyy ({1})", GetDateFormatEx(A_Now, "d/M/yyyy")), % BoundDateFormatOthersD_M_YYYY, +Radio
+    Menu, Others, Add, % Format("dd/MM/yyyy ({1})", GetDateFormatEx(A_Now, "dd/MM/yyyy")), % BoundDateFormatOthersDD_MM_YYYY, +Radio
+    Menu, Others, Add, % Format("d/M/yy ({1})", GetDateFormatEx(A_Now, "d/M/yy")), % BoundDateFormatOthersD_M_YY, +Radio
+    Menu, Others, Add, % Format("dd/MM/yy ({1})", GetDateFormatEx(A_Now, "dd/MM/yy")), % BoundDateFormatOthersDD_MM_YY, +Radio
+    
+    
     Menu, Tray, Add, DateFormat, :%dateFormatDefaultMenuName%
     
     
@@ -247,6 +263,17 @@ createTrayMenu() {
     Menu, Tray, Add, Help, :Help
 }
 
+HelpRecognitionKey()
+{
+    if (scopeLang = germanTwoLetter) {
+        MsgBox, 68, RecognitionKey - DateHotkey, % "Der RecognitionKey wird dazu verwendet, um das Ende eines Hotstring zu identifizieren.`n`nBeispiel 'Enter':`nHier muss der der Hotstring '#today4d' mit einem Enter bestätigt werden.`n`nBeispiel 'Tabulator':`nHier muss nach der Eingabe des Hotstrings 'today4d' die Eingabe mit der Tabulatortaste bestätigt werden.`n`nSoll GitHub für weitere Informationen geöffnet werden?"
+    }else{
+        MsgBox, 68, RecognitionKey - DateHotkey, % "The RecognitionKey is used to identify the end of a hotstring.`n`nExample 'Enter':`nAfter typing in the hotstring '#today4d', you have to confirm with pressing enter.`n`nExample 'Tabulator':`nAfter typing in the hotstring '#today4d', you have to confirm with pressing the tabulator key.`n`nDo you want to open GitHub for further information?"
+    }
+    IfMsgBox Yes
+        openGitHubRepository()
+}
+
 RecognitionKey(pRecognitionKey, pItemName, pItemPos, pMenuName)
 {
     if recognitionKeyLastItemName{
@@ -261,6 +288,17 @@ RecognitionKey(pRecognitionKey, pItemName, pItemPos, pMenuName)
     IniWrite, %pMenuName%, %iniFilePath%, RecognitionKey, MenuName
     Reload
     Return
+}
+
+HelpEndingKey()
+{
+    if (scopeLang = germanTwoLetter) {
+        MsgBox, 68, EndingKey - DateHotkey, % "Der EndingKey wird nach erfolgreichem Ersetzten des Hotstrings ausgegeben.`n`nBeispiel 'None':`nBei der Eingabe des Hotstrings '#today4d', wird einfach das Datum ohne Zusatz zurück gegeben.`n`nBeispiel 'Enter':`nBei der Eingabe des Hotstrings '#today4d', wird das Datum und die Eingabetaste zurückgegeben.`n`nSoll GitHub für weitere Informationen geöffnet werden?"
+    }else{
+        MsgBox, 68, EndingKey - DateHotkey, % "The EndingKey will be printed after giving the output for your hotstring.`n`nExample 'None':`nWhen entering '#today4d', you will receive the date string and nothing else.`n`nExample 'Enter':`nWhen entering '#today4d', you will receive the date string and a return afterwards.`n`nDo you want to open GitHub for further information?"
+    }
+    IfMsgBox Yes
+        openGitHubRepository()
 }
 
 EndingKey(pEndingKey, pItemName, pItemPos, pMenuName)
@@ -503,13 +541,14 @@ fMiddleware($, pDays:=0, pWeeks:=0, pMonths:=0, pYears:=0){
     }
 
 	While (Pos := Ma.Pos() = "" ? 1 : Ma.Pos()) := RegExMatch($.Value(1), expression, Ma, Pos + StrLen(Ma.Value(1))) {
-        If InStr(Ma.Value(3), shorts[1])
+        MsgBox, % InStr(Ma.Value(3), shorts[4]) = 1
+        If InStr(Ma.Value(3), shorts[1]) = 1
 			pDays += Ma.Value(2)
-		If InStr(Ma.Value(3), shorts[2]) || Ma.Value(3) = ""
+		If InStr(Ma.Value(3), shorts[2]) = 1 || Ma.Value(3) = ""
 			pWeeks += Ma.Value(2)
-		If InStr(Ma.Value(3), shorts[3])
+		If InStr(Ma.Value(3), shorts[3]) = 1
 			pMonths += Ma.Value(2)
-		If InStr(Ma.Value(3), shorts[4])
+		If InStr(Ma.Value(3), shorts[4]) = 1
 			pYears += Ma.Value(2)
 	}
 
