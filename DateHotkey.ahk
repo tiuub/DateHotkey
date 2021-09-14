@@ -6,8 +6,8 @@
 ;
 ; GitHub: https://github.com/tiuub/DateHotkey
 ; License: MIT (https://github.com/tiuub/DateHotkey)
-; Last update: 2021-07-29
-global VERSION = "1.3.0"
+; Last update: 2021-09-15
+global VERSION = "1.4.0"
 global LANG = "UNIVERSAL"
 global GITHUB = "https://github.com/tiuub/DateHotkey"
 
