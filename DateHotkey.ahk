@@ -240,6 +240,7 @@ createTrayMenu() {
     Menu, Others, Add, % Format("dd/MM/yyyy ({1})", GetDateFormatEx(A_Now, "dd/MM/yyyy")), % BoundDateFormatOthersDD_MM_YYYY, +Radio
     Menu, Others, Add, % Format("d/M/yy ({1})", GetDateFormatEx(A_Now, "d/M/yy")), % BoundDateFormatOthersD_M_YY, +Radio
     Menu, Others, Add, % Format("dd/MM/yy ({1})", GetDateFormatEx(A_Now, "dd/MM/yy")), % BoundDateFormatOthersDD_MM_YY, +Radio
+    Menu, %dateFormatDefaultMenuName%, Add, Others, :Others
     
     
     Menu, Tray, Add, DateFormat, :%dateFormatDefaultMenuName%
@@ -541,7 +542,6 @@ fMiddleware($, pDays:=0, pWeeks:=0, pMonths:=0, pYears:=0){
     }
 
 	While (Pos := Ma.Pos() = "" ? 1 : Ma.Pos()) := RegExMatch($.Value(1), expression, Ma, Pos + StrLen(Ma.Value(1))) {
-        MsgBox, % InStr(Ma.Value(3), shorts[4]) = 1
         If InStr(Ma.Value(3), shorts[1]) = 1
 			pDays += Ma.Value(2)
 		If InStr(Ma.Value(3), shorts[2]) = 1 || Ma.Value(3) = ""
