@@ -1,25 +1,32 @@
 ﻿#SingleInstance Prompt
 #Persistent
 
+
 ; DateHotkey
 ; Created by tiuub
 ;
 ; GitHub: https://github.com/tiuub/DateHotkey
 ; License: MIT (https://github.com/tiuub/DateHotkey)
-; Last update: 2021-09-16
-global VERSION = "1.4.1"
+; Last update: 2023-07-05
+global VERSION = "1.5.0"
 global LANG = "UNIVERSAL"
 global GITHUB = "https://github.com/tiuub/DateHotkey"
 
 global germanTwoLetter = "DE"
 global englishTwoLetter = "EN"
 
+global firstAccess := false
 global startingTimeDate := A_Now
 global iniFilePath := % Format("{1}/{2}.ini", A_Temp, A_ScriptName)
 global updateFilePath := % Format("{1}/{2}.remote.version.txt", A_Temp, A_ScriptName)
 global updateUrl := "https://raw.githubusercontent.com/tiuub/DateHotkey/master/VERSION"
-global updateDefaultEnabled := True
 global updateDefaultDayOffset := 2
+global dateFormatDefaultItemName := Format("Automatic ({1})", GetDateFormatEx(startingTimeDate))
+global dateFormatDefaultMenuName := "DateFormat"
+global dateFormatDefaultValue := ""
+global dateFormatLastItemName := ""
+global dateFormatLastMenuName := ""
+global dateFormat := ""
 global recognitionKeyDefaultItemName := "Enter"
 global recognitionKeyDefaultMenuName := "RecognitionKey"
 global recognitionKeyDefaultValue := "\R"
@@ -33,12 +40,12 @@ global endingKeyDefaultValue := ""
 global endingKeyLastItemName := ""
 global endingKeyLastMenuName := ""
 global endingKey := ""
-global dateFormatDefaultItemName := Format("Automatic ({1})", GetDateFormatEx(startingTimeDate))
-global dateFormatDefaultMenuName := "DateFormat"
-global dateFormatDefaultValue := ""
-global dateFormatLastItemName := ""
-global dateFormatLastMenuName := ""
-global dateFormat := ""
+global automaticUpdateCheckDefaultItemName := "Enabled"
+global automaticUpdateCheckDefaultMenuName := "UpdateCheck"
+global automaticUpdateCheckDefaultValue := true
+global automaticUpdateCheckLastItemName := ""
+global automaticUpdateCheckLastMenuName := ""
+global automaticUpdateCheck := false
 global scopeLanguageDefaultItemName := "English"
 global scopeLanguageDefaultMenuName := "Language"
 global scopeLanguageDefaultValue := %englishTwoLetter%
@@ -49,6 +56,13 @@ IniRead, scopeLang, %iniFilePath%, Language, Value, %englishTwoLetter%
 if (scopeLang = englishTwoLetter){
     IniWrite, %englishTwoLetter%, %iniFilePath%, Language, Value
 }
+global startupNotificationDefaultItemName := "Once"
+global startupNotificationDefaultMenuName := "StartupNotification"
+global startupNotificationDefaultValue := 1
+global startupNotificationLastItemName := ""
+global startupNotificationLastMenuName := ""
+global startupNotification := ""
+
 
 SetTitleMatchMode, RegEx
 DetectHiddenWindows, On
@@ -65,19 +79,16 @@ while (processId:=WinExist(".*(((EN|DE|UN)_DateHotkey|DateHotkey).(exe|ahk)).* a
         Exit
 }
 
-checkForUpdate()
 createTrayMenu()
 updateAboutSection()
 loadSavedSettings()
+checkForUpdate()
+showStartupNotification()
 registerHotstrings()
 return
 
 checkForUpdate(forcePoll:=False, showIfNotAvailable:=False) {
-    IniRead, updateEnabled, %iniFilePath%, Update, Enabled, %updateDefaultEnabled%
-    if (updateEnabled = updateDefaultEnabled) {
-        IniWrite, %updateDefaultEnabled%, %iniFilePath%, Update, Enabled
-    }
-    if (updateEnabled or forcePoll) {
+    if (automaticUpdateCheck or forcePoll) {
         IniRead, updateDayOffset, %iniFilePath%, Update, DayOffset, %updateDefaultDayOffset%
         if (updateDayOffset = updateDefaultDayOffset) {
             IniWrite, %updateDefaultDayOffset%, %iniFilePath%, Update, DayOffset
@@ -93,7 +104,7 @@ checkForUpdate(forcePoll:=False, showIfNotAvailable:=False) {
                 if ErrorLevel
                     break
                 RegExMatch(line, "O)::([A-Za-z]+):([0-9.]+)::", reg)
-                if (reg.Value(1) = LANG) {
+                if (reg.Value(1) = LANG or reg.Value(1) = "UNIVERSAL") {
                     langFound = True
                     if (compareVersionStrings(VERSION, reg.Value(2))) {
                         if (scopeLang = germanTwoLetter) {
@@ -114,7 +125,7 @@ checkForUpdate(forcePoll:=False, showIfNotAvailable:=False) {
             }
             if (!langFound and showIfNotAvailable){
                 if (scopeLang = germanTwoLetter) {
-                    MsgBox, 68, Update - DateHotkey, % Format("Deine aktuell installierte Sprache wird scheinbar nicht offiziell unterstütz!`n`nDeine aktuell installierte Sprache: {1}`n`nLade dir bestenfalls den neusten Release von DateHotkey über GitHub herunter.`nGitHub: https://github.com/tiuub/DateHotkey`n`nSoll GitHub im Browser geöffnet werden?", LANG)
+                    MsgBox, 68, Update - DateHotkey, % Format("Deine aktuell installierte Sprache wird scheinbar nicht unterstütz!`n`nDeine aktuell installierte Sprache: {1}`n`nLade dir bestenfalls den neusten Release von DateHotkey über GitHub herunter.`nGitHub: https://github.com/tiuub/DateHotkey`n`nSoll GitHub im Browser geöffnet werden?", LANG)
                 }else{
                     MsgBox, 68, Update - DateHotkey, % Format("Your currently installed language seems not to be supported at all.`n`nCurrently installed language: {1}`n`nConsider reinstalling DateHotkey from GitHub.`nGitHub: https://github.com/tiuub/DateHotkey`n`nDo you want to open GitHub in your browser?", LANG)
                 }
@@ -151,30 +162,8 @@ openConfigFile() {
 
 createTrayMenu() {
     Menu, Tray, Add
-    
-    BoundRecognitionKeyReturn := Func("RecognitionKey").Bind("\R")
-    BoundRecognitionKeyWhitespace := Func("RecognitionKey").Bind("[ ]")
-    BoundRecognitionKeyTabulator := Func("RecognitionKey").Bind("\t")
-    BoundRecognitionKeyDot := Func("RecognitionKey").Bind("[.]")
-    Menu, %recognitionKeyDefaultMenuName%, Add, %recognitionKeyDefaultItemName%, % BoundRecognitionKeyReturn, +Radio
-    Menu, %recognitionKeyDefaultMenuName%, Add, Whitespace, % BoundRecognitionKeyWhitespace, +Radio
-    Menu, %recognitionKeyDefaultMenuName%, Add, Tabulator, % BoundRecognitionKeyTabulator, +Radio
-    Menu, %recognitionKeyDefaultMenuName%, Add, Dot, % BoundRecognitionKeyDot, +Radio
-    Menu, %recognitionKeyDefaultMenuName%, Add
-    Menu, %recognitionKeyDefaultMenuName%, Add, Help, HelpRecognitionKey
-    Menu, Tray, Add, Recognition Key, :%recognitionKeyDefaultMenuName%
-    
-    BoundEndingKeyNone := Func("EndingKey").Bind("")
-    BoundEndingKeyReturn := Func("EndingKey").Bind("{Enter}")
-    BoundEndingKeyTabulator := Func("EndingKey").Bind("{Tab}")
-    Menu, %endingKeyDefaultMenuName%, Add, %endingKeyDefaultItemName%, % BoundEndingKeyNone, +Radio
-    Menu, %endingKeyDefaultMenuName%, Add, Return, % BoundEndingKeyReturn, +Radio
-    Menu, %endingKeyDefaultMenuName%, Add, Tabulator, % BoundEndingKeyTabulator, +Radio
-    Menu, %endingKeyDefaultMenuName%, Add
-    Menu, %endingKeyDefaultMenuName%, Add, Help, HelpEndingKey
-    Menu, Tray, Add, Ending Character, :%endingKeyDefaultMenuName%
-    
-    
+
+
     BoundDateFormatAutomatic := Func("DateFormat").Bind("")
     Menu, %dateFormatDefaultMenuName%, Add, %dateFormatDefaultItemName%, % BoundDateFormatAutomatic, +Radio
     
@@ -243,15 +232,56 @@ createTrayMenu() {
     Menu, %dateFormatDefaultMenuName%, Add, Others, :Others
     
     
-    Menu, Tray, Add, DateFormat, :%dateFormatDefaultMenuName%
+    Menu, Settings, Add, DateFormat, :%dateFormatDefaultMenuName%
+
+
+    Menu, Settings, add ; separator line
+
+    BoundRecognitionKeyReturn := Func("RecognitionKey").Bind("\R")
+    BoundRecognitionKeyWhitespace := Func("RecognitionKey").Bind("[ ]")
+    BoundRecognitionKeyTabulator := Func("RecognitionKey").Bind("\t")
+    BoundRecognitionKeyDot := Func("RecognitionKey").Bind("[.]")
+    Menu, %recognitionKeyDefaultMenuName%, Add, %recognitionKeyDefaultItemName%, % BoundRecognitionKeyReturn, +Radio
+    Menu, %recognitionKeyDefaultMenuName%, Add, Whitespace, % BoundRecognitionKeyWhitespace, +Radio
+    Menu, %recognitionKeyDefaultMenuName%, Add, Tabulator, % BoundRecognitionKeyTabulator, +Radio
+    Menu, %recognitionKeyDefaultMenuName%, Add, Dot, % BoundRecognitionKeyDot, +Radio
+    Menu, %recognitionKeyDefaultMenuName%, Add
+    Menu, %recognitionKeyDefaultMenuName%, Add, Help, HelpRecognitionKey
+    Menu, Settings, Add, Recognition Key, :%recognitionKeyDefaultMenuName%
     
+    BoundEndingKeyNone := Func("EndingKey").Bind("")
+    BoundEndingKeyReturn := Func("EndingKey").Bind("{Enter}")
+    BoundEndingKeyTabulator := Func("EndingKey").Bind("{Tab}")
+    Menu, %endingKeyDefaultMenuName%, Add, %endingKeyDefaultItemName%, % BoundEndingKeyNone, +Radio
+    Menu, %endingKeyDefaultMenuName%, Add, Return, % BoundEndingKeyReturn, +Radio
+    Menu, %endingKeyDefaultMenuName%, Add, Tabulator, % BoundEndingKeyTabulator, +Radio
+    Menu, %endingKeyDefaultMenuName%, Add
+    Menu, %endingKeyDefaultMenuName%, Add, Help, HelpEndingKey
+    Menu, Settings, Add, Ending Character, :%endingKeyDefaultMenuName%
+    
+    Menu, Settings, add ; separator line
     
     BoundScopeLanguageEnglish := Func("ScopeLanguage").Bind(englishTwoLetter)
     BoundScopeLanguageGerman := Func("ScopeLanguage").Bind(germanTwoLetter)
-    Menu, Language, Add, English, % BoundScopeLanguageEnglish, +Radio
-    Menu, Language, Add, German, % BoundScopeLanguageGerman, +Radio
-    Menu, Tray, Add, Language, :Language
+    Menu, %scopeLanguageDefaultMenuName%, Add, English, % BoundScopeLanguageEnglish, +Radio
+    Menu, %scopeLanguageDefaultMenuName%, Add, German, % BoundScopeLanguageGerman, +Radio
+    Menu, Settings, Add, Language, :%scopeLanguageDefaultMenuName%
     
+    BoundAutomaticUpdateCheckEnabled := Func("AutomaticUpdateCheck").Bind(true)
+    BoundAutomaticUpdateCheckDisabled := Func("AutomaticUpdateCheck").Bind(false)
+    Menu, %automaticUpdateCheckDefaultMenuName%, Add, Enabled, % BoundAutomaticUpdateCheckEnabled, +Radio
+    Menu, %automaticUpdateCheckDefaultMenuName%, Add, Disabled, % BoundAutomaticUpdateCheckDisabled, +Radio
+    Menu, Settings, Add, Auto Update Check, :%automaticUpdateCheckDefaultMenuName%
+    
+    BoundStartupNotificationEverytime := Func("StartupNotification").Bind(1)
+    BoundStartupNotificationOnce := Func("StartupNotification").Bind(2)
+    BoundStartupNotificationNever := Func("StartupNotification").Bind(0)
+    Menu, StartupNotification, Add, Everytime, % BoundStartupNotificationEverytime, +Radio
+    Menu, StartupNotification, Add, Once, % BoundStartupNotificationOnce, +Radio
+    Menu, StartupNotification, Add, Never, % BoundStartupNotificationNever, +Radio
+    Menu, Settings, Add, Notification On Startup, :StartupNotification
+    
+    Menu, Tray, Add, Settings, :Settings
     
     BoundCheckForUpdate := Func("checkForUpdate").Bind(True, True)
     BoundOpenGitHubRepositor := Func("openGitHubRepository").Bind("")
@@ -260,6 +290,7 @@ createTrayMenu() {
     Menu, Help, Add, Check for update, % BoundCheckForUpdate
     Menu, Help, Add, Open GitHub Repository, % BoundOpenGitHubRepositor
     Menu, Help, Add, Open config file, openConfigFile
+    Menu, Help, add ; separator line
     Menu, Help, Add, Donate, % BoundDonate
     Menu, Tray, Add, Help, :Help
 }
@@ -348,6 +379,36 @@ ScopeLanguage(pLanguageTwoLetter, pItemName, pItemPos, pMenuName)
     Return
 }
 
+AutomaticUpdateCheck(pState, pItemName, pItemPos, pMenuName)
+{
+    if automaticUpdateCheckLastItemName{
+        Menu, %pMenuName%, Uncheck, %automaticUpdateCheckLastItemName%
+    }
+    Menu, %pMenuName%, Check, %pItemName%
+    automaticUpdateCheckLastItemName = %pItemName%
+    automaticUpdateCheckLastMenuName = %pMenuName%
+    automaticUpdateCheck = %pState%
+    IniWrite, %pState%, %iniFilePath%, Update, Enabled
+    IniWrite, %pItemName%, %iniFilePath%, Update, ItemName
+    IniWrite, %pMenuName%, %iniFilePath%, Update, MenuName
+    Reload
+    Return
+}
+
+StartupNotification(pLanguageTwoLetter, pItemName, pItemPos, pMenuName)
+{
+    if startupNotificationLastItemName{
+        Menu, %pMenuName%, Uncheck, %startupNotificationLastItemName%
+    }
+    Menu, %pMenuName%, Check, %pItemName%
+    startupNotificationLastItemName = %pItemName%
+    startupNotificationLastMenuName = %pMenuName%
+    startupNotification = %pLanguageTwoLetter%
+    IniWrite, %pLanguageTwoLetter%, %iniFilePath%, StartupNotification, Value
+    IniWrite, %pItemName%, %iniFilePath%, StartupNotification, ItemName
+    IniWrite, %pMenuName%, %iniFilePath%, StartupNotification, MenuName
+}
+
 AboutPage(){
     MsgBox, 64, About - DateHotkey, % Format("DateHotkey by tiuub`nVersion: {1}`nLicense: MIT`nGitHub: https://github.com/tiuub/DateHotkey`n`nConfig: {2}`n`nDependencies:`nHotstring by menixator (2017-08-14)`nGetDateFormat by jNizM (2015-11-03)", VERSION, iniFilePath)
 }
@@ -362,6 +423,14 @@ updateAboutSection(){
 }
 
 loadSavedSettings() {
+    ; Set date of first access in the config file
+    IniRead, firstAccessDate, %iniFilePath%, About, FirstAccess
+    if (firstAccessDate = "ERROR"){
+        firstAccess := true
+        IniWrite, % GetDateFormatEx(startingTimeDate), %iniFilePath%, About, FirstAccess
+    }
+
+
     IniRead, recognitionKey, %iniFilePath%, RecognitionKey, Value
     if (recognitionKey = "ERROR"){
         recognitionKey = %recognitionKeyDefaultValue%
@@ -406,6 +475,59 @@ loadSavedSettings() {
     Menu, %scopeLanguageMenuName%, Check, %scopeLanguageItemName%
     scopeLanguageLastItemName = %scopeLanguageItemName%
     scopeLanguageLastMenuName = %scopeLanguageMenuName%
+    
+    IniRead, automaticUpdateCheck, %iniFilePath%, Update, Enabled
+    if (automaticUpdateCheck = "ERROR"){
+        automaticUpdateCheck = %automaticUpdateCheckDefaultValue%
+    }
+    IniRead, automaticUpdateCheckItemName, %iniFilePath%, Update, ItemName, %automaticUpdateCheckDefaultItemName%
+    IniRead, automaticUpdateCheckMenuName, %iniFilePath%, Update, MenuName, %automaticUpdateCheckDefaultMenuName%
+    Menu, %automaticUpdateCheckMenuName%, Check, %automaticUpdateCheckItemName%
+    automaticUpdateCheckLastItemName = %automaticUpdateCheckItemName%
+    automaticUpdateCheckLastMenuName = %automaticUpdateCheckMenuName%
+    
+    IniRead, startupNotification, %iniFilePath%, StartupNotification, Value
+    if (startupNotification = "ERROR"){
+        startupNotification = %startupNotificationDefaultValue%
+    }
+    IniRead, startupNotificationItemName, %iniFilePath%, StartupNotification, ItemName, %startupNotificationDefaultItemName%
+    IniRead, startupNotificationMenuName, %iniFilePath%, StartupNotification, MenuName, %startupNotificationDefaultMenuName%
+    Menu, %startupNotificationMenuName%, Check, %startupNotificationItemName%
+    startupNotificationLastItemName = %startupNotificationItemName%
+    startupNotificationLastMenuName = %startupNotificationMenuName%
+}
+
+randomTipGenerator(scopeLang) { 
+    units := ["today", "yesterday", "tomorrow", "monday", "tu", "thursday", "sa"] ; not complete
+    if (scopeLang = germanTwoLetter) {
+        units := ["heute", "gestern", "morgen", "montag", "di", "mittwoch", "sa"] ; not complete
+    }
+    Random, rand, 1, units.MaxIndex()
+    unit := units[rand]
+
+    operators := ["+", "-", ""]
+    Random, rand, 1, operators.MaxIndex()
+    operator := operators[rand]
+
+    intervals := ["days", "weeks", "months", "y"] ; not complete
+    if (scopeLang = germanTwoLetter) {
+        intervals := ["tage", "wochen", "monate", "j"] ; not complete
+    }
+    Random, rand, 1, intervals.MaxIndex()
+    interval := intervals[rand]
+    
+    Random, rand, 2, 7
+    return Format("#{1}{2}{3}{4}", unit, operator, rand, interval)
+}
+
+showStartupNotification() {
+    if (startupNotification = 1 or firstAccess) {
+        if (scopeLang = germanTwoLetter) {
+            TrayTip, DateHotkey wurde gestartet, % Format("Probiers aus! Gebe {1} ein", randomTipGenerator(scopeLang)), 30, 1
+        }else{
+            TrayTip, DateHotkey started, % Format("Give it a try! Type {1}", randomTipGenerator(scopeLang)), 30, 1
+        }
+    }
 }
 
 registerHotstrings() {
